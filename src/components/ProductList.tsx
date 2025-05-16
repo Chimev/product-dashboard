@@ -5,8 +5,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { loadProducts } from "@/store/productSlice";
 import { FiEdit2, FiTrash2, FiAlertCircle, FiBox, FiBarChart2, FiDollarSign, FiMoreVertical } from "react-icons/fi";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { LoadingSkeleton } from "./skeleton/LoadingSkeleton";
 
 const ProductList = () => {
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { items, status, error, searchQuery, selectedCategory, currentPage, itemsPerPage } = useSelector(
     (state: RootState) => state.products
@@ -35,72 +39,20 @@ const ProductList = () => {
     setExpandedRow(expandedRow === id ? null : id);
   };
 
-  // Loading skeleton component
-  const LoadingSkeleton = () => (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-      <div className="animate-pulse p-4 space-y-2">
-        <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-        <div className="h-10 bg-gray-200 rounded"></div>
-      </div>
-      <div className="overflow-x-auto">
-        {/* Desktop skeleton */}
-        <table className="min-w-full divide-y divide-gray-200 hidden md:table">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10"></th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {[...Array(5)].map((_, index) => (
-              <tr key={index} className="animate-pulse">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="h-10 w-10 bg-gray-200 rounded"></div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="h-8 bg-gray-200 rounded w-24"></div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        
-        {/* Mobile skeleton */}
-        <div className="md:hidden">
-          {[...Array(5)].map((_, index) => (
-            <div key={index} className="animate-pulse p-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="h-12 w-12 bg-gray-200 rounded"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-32"></div>
-                    <div className="h-3 bg-gray-200 rounded w-24"></div>
-                  </div>
-                </div>
-                <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  // Handle edit product
+  const handleEdit = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/products/edit/${id}`);
+  };
+
+  // Handle delete product
+  const handleDelete = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Implement delete functionality here
+    console.log(`Delete product ${id}`);
+  };
+
+ 
 
   // Error state component
   const ErrorState = () => (
@@ -110,12 +62,6 @@ const ProductList = () => {
       </div>
       <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load products</h3>
       <p className="text-gray-500 mb-4">{error || "Please try again later"}</p>
-      <button 
-        onClick={() => dispatch(loadProducts())} 
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-      >
-        Try Again
-      </button>
     </div>
   );
 
@@ -181,21 +127,26 @@ const ProductList = () => {
               return (
                 <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="h-12 w-12 bg-gray-50 rounded border border-gray-200 p-1">
-                      <img 
+                    <div className="h-12 w-12 bg-gray-50 rounded border border-gray-200 p-1 relative">
+                      <Image 
                         src={product.image} 
                         alt={product.title} 
-                        className="h-full w-full object-contain mix-blend-multiply" 
-                        loading="lazy"
+                        className="object-contain mix-blend-multiply" 
+                        fill
+                        sizes="(max-width: 48px) 100vw, 48px"
+                        priority={false}
                       />
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900 line-clamp-2">{product.title}</div>
-                    <div className="text-xs text-gray-500">{`ID: ${product.id}`}</div>
+                    <p 
+                      className="cursor-pointer text-sm font-medium text-gray-900 line-clamp-2 hover:text-blue-600"
+                    >
+                      {product.title}
+                    </p>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100  text-blue-800">
+                    <span className="px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100 text-blue-800">
                       {product.category}
                     </span>
                   </td>
@@ -212,10 +163,16 @@ const ProductList = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button className="p-1 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
+                      <button 
+                        className="p-1 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                        onClick={(e) => handleEdit(product.id, e)}
+                      >
                         <FiEdit2 className="w-4 h-4" />
                       </button>
-                      <button className="p-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
+                      <button 
+                        className="p-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                        onClick={(e) => handleDelete(product.id, e)}
+                      >
                         <FiTrash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -240,12 +197,14 @@ const ProductList = () => {
                 onClick={() => toggleRow(product.id)}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="h-12 w-12 bg-gray-50 rounded border border-gray-200 p-1 flex-shrink-0">
-                    <img 
+                  <div className="h-12 w-12 bg-gray-50 rounded border border-gray-200 p-1 flex-shrink-0 relative">
+                    <Image 
                       src={product.image} 
                       alt={product.title} 
-                      className="h-full w-full object-contain mix-blend-multiply" 
-                      loading="lazy"
+                      className="object-contain mix-blend-multiply" 
+                      fill
+                      sizes="(max-width: 48px) 100vw, 48px"
+                      priority={false}
                     />
                   </div>
                   <div>
@@ -272,7 +231,7 @@ const ProductList = () => {
                     <div>
                       <div className="text-gray-500">Category</div>
                       <div className="font-medium mt-1">
-                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full  text-blue-800">
+                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full text-blue-800">
                           {product.category}
                         </span>
                       </div>
@@ -299,11 +258,17 @@ const ProductList = () => {
                   </div>
                   
                   <div className="mt-4 flex space-x-2">
-                    <button className="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 flex items-center justify-center">
+                    <button 
+                      className="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 flex items-center justify-center"
+                      onClick={(e) => handleEdit(product.id, e)}
+                    >
                       <FiEdit2 className="w-4 h-4 mr-1" />
                       <span>Edit</span>
                     </button>
-                    <button className="flex-1 py-2 px-4 bg-red-50 text-red-600 rounded-md hover:bg-red-100 flex items-center justify-center">
+                    <button 
+                      className="flex-1 py-2 px-4 bg-red-50 text-red-600 rounded-md hover:bg-red-100 flex items-center justify-center"
+                      onClick={(e) => handleDelete(product.id, e)}
+                    >
                       <FiTrash2 className="w-4 h-4 mr-1" />
                       <span>Delete</span>
                     </button>
@@ -315,10 +280,10 @@ const ProductList = () => {
         })}
       </div>
       
-      {/* Pagination component could go here */}
+      {/* Pagination component with Next.js link integration */}
       {filtered.length > itemsPerPage && (
         <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div className="flex-1 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">{start + 1}</span> to{" "}
@@ -328,7 +293,6 @@ const ProductList = () => {
                 of <span className="font-medium">{filtered.length}</span> results
               </p>
             </div>
-            
           </div>
         </div>
       )}
