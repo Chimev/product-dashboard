@@ -8,6 +8,8 @@ import { FiEdit2, FiTrash2, FiAlertCircle, FiBox, FiBarChart2, FiDollarSign, FiM
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LoadingSkeleton } from "./skeleton/LoadingSkeleton";
+import { ErrorState } from "./productState/ErrorState";
+import { EmptyState } from "./productState/EmptyState";
 
 const ProductList = () => {
   const router = useRouter();
@@ -39,52 +41,24 @@ const ProductList = () => {
     setExpandedRow(expandedRow === id ? null : id);
   };
 
-  // Handle edit product
+  // This was built incase i needed it
   const handleEdit = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/products/edit/${id}`);
   };
 
-  // Handle delete product
+  // This was built incase i needed it
   const handleDelete = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     // Implement delete functionality here
     console.log(`Delete product ${id}`);
   };
 
- 
-
-  // Error state component
-  const ErrorState = () => (
-    <div className="bg-white rounded-lg border border-red-200 p-6 text-center">
-      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-500 mb-4">
-        <FiAlertCircle className="w-6 h-6" />
-      </div>
-      <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load products</h3>
-      <p className="text-gray-500 mb-4">{error || "Please try again later"}</p>
-    </div>
-  );
-
-  // Empty state component
-  const EmptyState = () => (
-    <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-500 mb-4">
-        <FiBox className="w-6 h-6" />
-      </div>
-      <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-      <p className="text-gray-500">
-        {searchQuery || selectedCategory 
-          ? "Try adjusting your filters or search term" 
-          : "Add your first product to get started"}
-      </p>
-    </div>
-  );
-
   if (status === "loading") return <LoadingSkeleton />;
-  if (status === "failed") return <ErrorState />;
-  if (paginated.length === 0) return <EmptyState />;
+  if (status === "failed") return <ErrorState error={error} />;
+  if (paginated.length === 0) return <EmptyState searchQuery={searchQuery} selectedCategory={selectedCategory} />;
 
-  // Generate random stock number for demo purposes
+  // Generate random stock number for demo purposes(the API didint provide)
   const getRandomStock = () => Math.floor(Math.random() * 100);
 
   return (
@@ -280,7 +254,7 @@ const ProductList = () => {
         })}
       </div>
       
-      {/* Pagination component with Next.js link integration */}
+      {/* This linked with the Pagination Component */}
       {filtered.length > itemsPerPage && (
         <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div className="flex-1 flex items-center justify-between">

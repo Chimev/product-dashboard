@@ -18,7 +18,7 @@ interface ProductState {
   selectedCategory: string;
   currentPage: number;
   itemsPerPage: number;
-  categories: string[]; // ✅ New: Store unique categories
+  categories: string[]; 
 }
 
 const initialState: ProductState = {
@@ -29,10 +29,10 @@ const initialState: ProductState = {
   selectedCategory: "",
   currentPage: 1,
   itemsPerPage: 9,
-  categories: [], // ✅ Initialize categories
+  categories: [], 
 };
 
-// ✅ Async thunk to fetch products
+// Async to fetch products
 export const loadProducts = createAsyncThunk("products/load", async () => {
   return await fetchProducts();
 });
@@ -66,7 +66,7 @@ const productSlice = createSlice({
         state.status = "succeeded";
         state.items = action.payload;
 
-        // ✅ Extract unique categories from the products
+        // Extract unique categories from the products
         const categorySet = new Set(action.payload.map((p: Product) => p.category));
         state.categories = Array.from(categorySet) as any;
       })

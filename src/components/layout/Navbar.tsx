@@ -8,14 +8,12 @@ const Navbar = () => {
 
   return (
     <div className="w-full px-4 md:px-6 py-3 flex justify-between items-center shadow bg-white">
-      {/* Welcome Message (replacing search input) */}
       <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
         Welcome back 👋
       </h2>
 
       {/* Right Section */}
       <div className="flex items-center gap-4 sm:gap-6 relative">
-        {/* Notification Icon */}
         <FiBell className="text-lg sm:text-xl text-gray-700 cursor-pointer" />
 
         {/* Admin Dropdown */}
