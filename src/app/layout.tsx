@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/layout/Navbar";
+import Sidebar from "@/components/layout/Sidebar";
+import { Provider } from "react-redux";
+import { store } from "@/store";
+import ReduxProvider from "@/components/providers/Provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,9 +30,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-50 overflow-hidden`}
       >
-        {children}
+        <ReduxProvider>
+          <div className="flex min-h-screen">
+            <aside className="h-screen sticky top-0">
+              <Sidebar />
+            </aside>
+            
+            <main className="flex-1 flex flex-col h-screen overflow-hidden">
+              <Navbar />
+              <div className="flex-1 p-4 overflow-y-auto">
+                {children}
+              </div>
+            </main>
+          </div>
+        </ReduxProvider>
       </body>
     </html>
   );
